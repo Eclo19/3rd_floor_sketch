@@ -2,9 +2,11 @@ class Shelf {
   float x, y;  // Position of the shelf (origin coordinates)
   float wdth, depth;  // Dimensions of the shelf
   float r = 10;  // Corner radius
-  color fill = color(0, 0, 0); // Default fill color (black)
+  color fill_shelf = color(40, 50, 20); // Default fill color (black)
   boolean rotate; // Flag to determine if the shelf should be rotated
   boolean isSelected = false; // Flag to check if the shelf is selected
+  float precision= 0.25; // fraction of a foot that object can snap to in grid
+    
   
   // Constructor to initialize the shelf's properties
   Shelf(float x, float y, float wdth, float depth, boolean rotate) {
@@ -34,7 +36,7 @@ class Shelf {
     } else {
       noStroke(); // No border for unselected shelves
     }
-    fill(fill); // Set fill color to the current color
+    fill(fill_shelf); // Set fill color to the current color
     rect(ft_to_pixel(x), ft_to_pixel(y), ft_to_pixel(wdth), ft_to_pixel(depth), r);
   }
   
@@ -47,12 +49,12 @@ class Shelf {
   
   // Update shelf position (snap to 0.5x0.5 ft grid)
   void updatePosition(float mouseX, float mouseY) {
-    x = round((mouseX - 4) / ft_to_pixel(0.5)) * 0.5; // Quantize to nearest 0.5 ft grid square
-    y = round((mouseY - 4) / ft_to_pixel(0.5)) * 0.5;
+    x = round((mouseX - 4) / ft_to_pixel(precision)) * precision; // Quantize to precision
+    y = round((mouseY - 4) / ft_to_pixel(precision)) * precision;
   }
   
   // Method to change the color of the shelf
   void setColor(color newColor) {
-    fill = newColor;
+    fill_shelf = newColor;
   }
 }
