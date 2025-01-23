@@ -22,6 +22,9 @@ Shelf selectedShelf = null; // Currently selected shelf
 // Create a person
 Person steve;
 
+//Create measuring circle
+Circle circ;
+
 // Shelf colors
 color audio_shelf_color = color(131, 20, 216);
 color videogame_shelf_color = color(12, 125, 201);
@@ -37,8 +40,8 @@ float roomX = ft_in_to_pixel(22, 10); // Room x dimension in pixels
 float roomY = ft_in_to_pixel(27, 10); // Room y dimension in pixels
 
 // Table dimensions in feet
-float table_width = 12;
-float table_depth = 5;
+float table_width = 10;
+float table_depth = 4;
 
 public void settings() {
   size(int(roomX), int(roomY)); // Room size
@@ -72,21 +75,30 @@ void setup() {
   light_shelf1 = new Shelf(18.75, 5, 4, 1.5, false);
   light_shelf2 = new Shelf(18.75, 8, 4, 1.5, false);
   light_shelf3 = new Shelf(18.75, 11, 4, 1.5, false);
+  
   audio_shelf = new Shelf(19.75, 14, 3, 1.5, false);
   audio_shelf.setColor(audio_shelf_color);
+  
   repair_shelf = new Shelf(19.75, 17, 3, 1.5, false);
   repair_shelf.setColor(audio_shelf_color);
+  
   videogame_shelf = new Shelf(16.75, 21, 6, 2, false);
   videogame_shelf.setColor(videogame_shelf_color);
+  
   camera_shelf = new Shelf(18.75, 25.75, 4, 2, false);
   camera_shelf.setColor(camera_shelf_color);
+  
   kit_shelf = new Shelf(14.5, 25.75, 4, 2, false);
   kit_shelf.setColor(kit_shelf_color);
+  
   table = new Shelf(10, 10, table_width, table_depth, true);
   table.setColor(table_color);
 
   // Initialize the person
-  steve = new Person(4, 4, 0.45, 1.9, 0.9); // x, y, head_radius, shoulder_width, shoulder_depth
+  steve = new Person(4, 4, 0.48, 2.2, 1.1); // x, y, head_radius, shoulder_width, shoulder_depth
+  
+  //Initialize the measuring circle
+  circ = new Circle(10, 10);
 }
 
 void drawGrid() {
@@ -194,6 +206,14 @@ void draw() {
   if (steve.isSelected) {
     steve.updatePosition(mouseX, mouseY);
   }
+  
+    // If the circle is selected, update its position
+  if (circ.isSelected) {
+    circ.updatePosition(mouseX, mouseY);
+  }
+  
+  //Draw measuring circle
+  circ.draw();
 
   // Draw shelves
   light_shelf1.draw();
@@ -205,15 +225,21 @@ void draw() {
   camera_shelf.draw();
   kit_shelf.draw();
   table.draw();
+ 
 
   // Draw the person
   steve.draw();
+  
+  
 }
 
 void mousePressed() {
-  if (selectedShelf == null && !steve.isSelected) {
-    if (steve.isMouseOverShoulders()) {
-      steve.isSelected = true;
+  if (selectedShelf == null && !steve.isSelected && !circ.isSelected) {
+    // Check if the mouse is over the circle
+    if (circ.isMouseOver()) {
+      circ.isSelected = true; // Select the circle
+    } else if (steve.isMouseOverShoulders()) {
+      steve.isSelected = true; // Select the person
     } else if (light_shelf1.isMouseOver()) selectShelf(light_shelf1);
     else if (light_shelf2.isMouseOver()) selectShelf(light_shelf2);
     else if (light_shelf3.isMouseOver()) selectShelf(light_shelf3);
@@ -224,10 +250,13 @@ void mousePressed() {
     else if (kit_shelf.isMouseOver()) selectShelf(kit_shelf);
     else if (table.isMouseOver()) selectShelf(table);
   } else {
+    // Place the circle or shelf in its current position
     placeShelf();
-    steve.isSelected = false;
+    circ.isSelected = false; // Deselect the circle
+    steve.isSelected = false; // Deselect the person
   }
 }
+
 
 void selectShelf(Shelf shelf) {
   if (selectedShelf != null) {
@@ -243,6 +272,7 @@ void placeShelf() {
     selectedShelf = null;
   }
 }
+
 
 void keyPressed() {
   if (key == 'R' || key == 'r') {
